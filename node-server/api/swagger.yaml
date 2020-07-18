@@ -1,0 +1,60 @@
+openapi: 3.0.1
+info:
+  title: RaspiAPI
+  description: This is the server to function as interface for the rasperry pi in
+    the alarm-clock project. It will provide options to interact with the local programs
+    as well as Curl system data
+  contact:
+    email: lorenz.keefer@web.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: system_info
+  description: Everything about your Raspberry Pi
+- name: alarm_clock
+  description: Access to the actual alarm clock
+paths:
+  /system_info/temperature:
+    get:
+      tags:
+      - system_info
+      summary: Check the temperature of your pi
+      operationId: checkTemp
+      responses:
+        200:
+          description: Ok
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+                x-content-type: '*/*'
+      x-swagger-router-controller: SystemInfo
+  /alarm_clock/all:
+    get:
+      tags:
+      - alarm_clock
+      summary: Get all existing Alarm Clocks
+      description: Get all existing Alarm Clocks
+      operationId: getAllAlarmClocks
+      responses:
+        200:
+          description: Ok
+          content:
+            application/xml:
+              schema:
+                type: integer
+                format: int64
+                x-content-type: application/xml
+            application/json:
+              schema:
+                type: integer
+                format: int64
+                x-content-type: application/xml
+      x-swagger-router-controller: AlarmClock
+components:
+  schemas: {}
