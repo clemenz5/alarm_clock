@@ -1,8 +1,9 @@
 #!/bin/bash
-
+LANG=en_us_8859_1
 title=
 date=
 timestamp=
+music=
 
 add_alarm_clock()
 {
@@ -10,19 +11,28 @@ add_alarm_clock()
     echo "title: $title"
     echo "timestamp: $timestamp"
 
-    echo "h[Unit]
-# Abschnitt wird im Artikel systemd/Units beschrieben
-[Service]
-Type=simple
-ExecStart=/PFAD/ZUM/BEFEHL/befehl
+    echo "[Service]
+ExecStart=/home/pi/tizonia_skript.sh \"$music\"
+User=pi
+Type=forking
+EnvironmentFile=/home/pi/a" > /etc/systemd/system/$title.kron.service
+
+    echo "[Unit]
+Description=start the alarm clock on date
+
+[Timer]
+OnCalendar=$(date --date="@$timestamp" +"%a %Y-%m-%d %H:%M:%S")
+Persistent=true
+
 [Install]
-# Abschnitt wird im Artikel systemd/Units beschrieben" > /etc/systemd/$title.kron.service
+WantedBy=timers.target" > /etc/systemd/system/$title.kron.timer
 }
 
 remove_alarm_clock()
 {
     echo "remove alarm clock"
-    rm /etc/systemd/$title.kron.service
+    rm /etc/systemd/system/$title.kron.service
+    rm /etc/systemd/system/$title.kron.timer
     if [ $? != 0 ]
     then echo "problem when deleting"
     else echo "success deleting"
@@ -30,13 +40,14 @@ remove_alarm_clock()
 }
 
 case $1 in
-    -a | --add )    if [ $# != 3 ]
+    -a | --add )    if [ $# != 4 ]
                         then 
                         echo "Wrong number of args" 
                         exit 1
                     fi
                     title=$2
-                    timestamp=$3
+                    music=$3
+                    timestamp=$4
                     add_alarm_clock;;
     -r | --remove ) if [ $# != 2 ]
                         then 
