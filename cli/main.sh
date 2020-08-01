@@ -27,7 +27,7 @@ Persistent=true
 [Install]
 WantedBy=basic.target" > /etc/systemd/system/$title.kron.timer
 
-    
+    sudo systemctl enable --now $title.kron.timer
 }
 
 remove_alarm_clock()
