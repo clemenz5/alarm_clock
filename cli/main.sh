@@ -25,7 +25,9 @@ OnCalendar=$(date --date="@$timestamp" +"%a %Y-%m-%d %H:%M:%S")
 Persistent=true
 
 [Install]
-WantedBy=timers.target" > /etc/systemd/system/$title.kron.timer
+WantedBy=basic.target" > /etc/systemd/system/$title.kron.timer
+
+    
 }
 
 remove_alarm_clock()
