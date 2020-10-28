@@ -28,6 +28,8 @@ Persistent=true
 WantedBy=basic.target" > /etc/systemd/system/$title.kron.timer
 
     sudo systemctl enable --now $title.kron.timer
+    sudo systemctl restart $title.kron.timer
+    echo $(systemctl status $title.kron.timer | grep Trigger)
 }
 
 remove_alarm_clock()
