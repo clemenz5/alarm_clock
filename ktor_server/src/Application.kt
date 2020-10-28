@@ -25,7 +25,8 @@ fun Application.module(testing: Boolean = false) {
 
         }
         get("/all-timers") {
-
+            val request = call.receive<String>()
+            call.respond("You connected")
         }
 
         post("/timer") {
