@@ -27,7 +27,7 @@ fun Application.module(testing: Boolean = false) {
         }
         get("/all-timers") {
             val request = call.receive<String>()
-            val process = ProcessBuilder("ls", "/etc/systemd/system/ | grep kron.timer").start()
+            val process = ProcessBuilder("ls", "/etc/systemd/system/", "|", "grep", "kron.timer").start()
             process.inputStream.reader(Charsets.UTF_8).use {
                 call.respond(it.readText())
                 println(it.readText())
