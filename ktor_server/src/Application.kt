@@ -7,6 +7,7 @@ import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -26,7 +27,13 @@ fun Application.module(testing: Boolean = false) {
         }
         get("/all-timers") {
             val request = call.receive<String>()
-            call.respond("You connected")
+            val process = ProcessBuilder("curl", "https://example.com").start()
+            process.inputStream.reader(Charsets.UTF_8).use {
+                call.respond(it.readText())
+                println(it.readText())
+            }
+            process.waitFor(1, TimeUnit.SECONDS)
+
         }
 
         post("/timer") {
