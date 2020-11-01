@@ -8,6 +8,8 @@ import io.ktor.request.*
 import io.ktor.routing.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.io.File
+import java.io.IOException
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -27,18 +29,32 @@ fun Application.module(testing: Boolean = false) {
         }
         get("/all-timers") {
             val request = call.receive<String>()
-            val process = ProcessBuilder("ls", "/etc/systemd/system/ | grep kron.timer").start()
-            process.inputStream.reader(Charsets.UTF_8).use {
-                call.respond(it.readText())
-                println(it.readText())
-            }
-            process.waitFor(1, TimeUnit.SECONDS)
-
+            call.respondText("./getTimers.sh".runCommand(File("/home/pi/alarm_clock/ktor_server"))!!);
         }
 
         post("/timer") {
             val request = call.receive<String>()
-            var alarm = Gson().fromJson(request, Alarm::class.java)
+            var alarm:Alarm = Gson().fromJson(request, Alarm::class.java)
+            var command:String = StringBuilder().append("sudo ./main.sh").append(" -a ").append(alarm.name).append(" ").append(alarm.spotify).append(" ").append(alarm.time).toString()
+            println(command)
+            call.respondText(command.runCommand(File("/home/pi/alarm_clock/cli"))!!)
         }
+    }
+}
+
+fun String.runCommand(workingDir: File): String? {
+    try {
+        val parts = this.split("\\s".toRegex())
+        val proc = ProcessBuilder(*parts.toTypedArray())
+                .directory(workingDir)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start()
+
+        proc.waitFor(60, TimeUnit.MINUTES)
+        return proc.inputStream.bufferedReader().readText()
+    } catch(e: IOException) {
+        e.printStackTrace()
+        return null
     }
 }
